@@ -1,5 +1,4 @@
-﻿using PatientService.Data.DbContext;
-using PatientService.Data.Entities;
+﻿using PatientService.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
