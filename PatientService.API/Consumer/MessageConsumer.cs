@@ -1,6 +1,4 @@
 ﻿using MassTransit;
-using System;
-using System.Threading.Tasks;
 
 namespace PatientService.API.Consumer
 {
