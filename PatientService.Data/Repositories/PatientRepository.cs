@@ -1,8 +1,10 @@
-﻿using PatientService.Data.Entities;
+﻿using PatientService.Data.Context;
+using PatientService.Data.Entities;
+using PatientService.Domain.Repositories;
 
 namespace PatientService.Data.Repositories
 {
-    public class PatientRepository : IPatientRepository
+    public class PatientRepository 
     {
         private readonly PatientDbContext _dbContext;
 

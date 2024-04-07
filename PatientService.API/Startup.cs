@@ -22,26 +22,10 @@ namespace PatientService.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PatientService API", Version = "v1" });
             });
-
-            services.AddMassTransit(config =>
-            {
-                var rabbitMqSettings = Configuration.GetSection("RabbitMQ").Get<RabbitMqSettings>();
-
-                config.UsingRabbitMq((ctx, cfg) =>
-                {
-                    cfg.Host(rabbitMqSettings.Host, rabbitMqSettings.VirtualHost, h =>
-                    {
-                        h.Username(rabbitMqSettings.UserName);
-                        h.Password(rabbitMqSettings.Password);
-                    });
-                });
-
-                // Add consumers, sagas, etc.
-                config.AddConsumer<MessageConsumer>();
-            });
+ 
 
             // Register consumers, sagas, etc. as scoped services
-            services.AddScoped<MessageConsumer>();
+            services.AddScoped<PatientConsumer>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Services;
 
@@ -9,10 +10,12 @@ namespace PatientService.API.Controllers
     public class PatientsController : ControllerBase
     {
         private readonly IPatientService _patientService;
+        private readonly ILogger<PatientsController> _logger;
 
-        public PatientsController(IPatientService patientService)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
         {
             _patientService = patientService;
+            _logger = logger;
         }
 
         [HttpGet]
