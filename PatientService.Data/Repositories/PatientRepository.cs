@@ -1,6 +1,8 @@
-﻿using PatientService.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using PatientService.Data.Context;
 using PatientService.Data.Entities;
 using PatientService.Domain.Repositories;
+using System.Numerics;
 
 namespace PatientService.Data.Repositories
 {
@@ -13,20 +15,36 @@ namespace PatientService.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Patient> GetAll()
+        public async Task<List<Patient>> GetAllPatients()
         {
-            return _dbContext.Patients.ToList();
+            return await _dbContext.Patients.ToListAsync();
         }
 
-        public Patient GetById(int id)
+        public async Task<Patient?> GetPatientById(int id)
         {
-            return _dbContext.Patients.FirstOrDefault(p => p.Id == id);
+            return await _dbContext.Patients.FindAsync(id);
         }
 
-        public void Add(Patient patient)
+        public async Task AddPatient(Patient patient)
         {
             _dbContext.Patients.Add(patient);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdatePatient(Patient patient)
+        {
+            _dbContext.Patients.Update(patient);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeletePatient(int id)
+        {
+            var patient = await _dbContext.Patients.FindAsync(id);
+            if (patient != null)
+            {
+                _dbContext.Patients.Remove(patient);
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }

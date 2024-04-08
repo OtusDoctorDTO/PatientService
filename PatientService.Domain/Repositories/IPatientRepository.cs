@@ -4,9 +4,11 @@ namespace PatientService.Domain.Repositories
 {
     public interface IPatientRepository
     {
-        IEnumerable<Patient> GetAll();
-        Patient GetById(int id);
-        void Add(Patient patient);
+        Task<List<Patient>> GetAllPatients();
+        Task<Patient?> GetPatientById(int id);
+        Task AddPatient(Patient patient);
+        Task UpdatePatient(Patient patient);
 
+        Task DeletePatient(int id);
     }
 }
