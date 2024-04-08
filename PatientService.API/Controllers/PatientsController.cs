@@ -18,22 +18,24 @@ namespace PatientService.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Patient>> GetAllPatients()
-        {
-            var patients = _patientService.GetAllPatients();
-            return Ok(patients);
-        }
-
         [HttpGet("{id}")]
         public ActionResult<Patient> GetPatientById(int id)
         {
-            var patient = _patientService.GetPatientById(id);
-            if (patient == null)
+            try
             {
-                return NotFound();
+                var patient = _patientService.GetPatientById(id);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+                return Ok(patient);
             }
-            return Ok(patient);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Произошла ошибка GetPatientById");
+                return BadRequest();
+            }
+            
         }
 
     }

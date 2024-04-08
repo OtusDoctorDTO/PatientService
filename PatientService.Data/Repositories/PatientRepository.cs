@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PatientService.Data.Context;
-using PatientService.Data.Entities;
+using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
-using System.Numerics;
 
 namespace PatientService.Data.Repositories
 {
-    public class PatientRepository 
+    public class PatientRepository : IPatientRepository
     {
         private readonly PatientDbContext _dbContext;
 
@@ -15,26 +14,14 @@ namespace PatientService.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<Patient>> GetAllPatients()
+        public async Task UpdatePatient(int id)
         {
-            return await _dbContext.Patients.ToListAsync();
-        }
-
-        public async Task<Patient?> GetPatientById(int id)
-        {
-            return await _dbContext.Patients.FindAsync(id);
-        }
-
-        public async Task AddPatient(Patient patient)
-        {
-            _dbContext.Patients.Add(patient);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task UpdatePatient(Patient patient)
-        {
-            _dbContext.Patients.Update(patient);
-            await _dbContext.SaveChangesAsync();
+            var patient = await _dbContext.Patients.FindAsync(id);
+            if (patient != null)
+            {
+                _dbContext.Patients.Update(patient);
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task DeletePatient(int id)
