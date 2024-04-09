@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.OpenApi.Models;
-using PatientService.API.Consumer;
+using PatientService.API.Settings;
 
 namespace PatientService.API
 {
@@ -25,8 +25,7 @@ namespace PatientService.API
 
             services.AddMassTransit(config =>
             {
-                var rabbitMqSettings = Configuration.GetSection("RabbitMQ").Get<RabbitMqSettings>();
-
+                var rabbitMqSettings = Configuration.GetSection("RabbitMQ").Get<RabbitMqSetting>();
                 config.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(rabbitMqSettings.Host, rabbitMqSettings.VirtualHost, h =>
@@ -36,12 +35,7 @@ namespace PatientService.API
                     });
                 });
 
-                // Add consumers, sagas, etc.
-                config.AddConsumer<MessageConsumer>();
             });
-
-            // Register consumers, sagas, etc. as scoped services
-            services.AddScoped<MessageConsumer>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

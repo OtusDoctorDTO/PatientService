@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Services;
 
@@ -9,28 +10,32 @@ namespace PatientService.API.Controllers
     public class PatientsController : ControllerBase
     {
         private readonly IPatientService _patientService;
+        private readonly ILogger<PatientsController> _logger;
 
-        public PatientsController(IPatientService patientService)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
         {
             _patientService = patientService;
-        }
-
-        [HttpGet]
-        public ActionResult<IEnumerable<Patient>> GetAllPatients()
-        {
-            var patients = _patientService.GetAllPatients();
-            return Ok(patients);
+            _logger = logger;
         }
 
         [HttpGet("{id}")]
         public ActionResult<Patient> GetPatientById(int id)
         {
-            var patient = _patientService.GetPatientById(id);
-            if (patient == null)
+            try
             {
-                return NotFound();
+                var patient = _patientService.GetPatientById(id);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+                return Ok(patient);
             }
-            return Ok(patient);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Произошла ошибка GetPatientById");
+                return BadRequest();
+            }
+            
         }
 
     }

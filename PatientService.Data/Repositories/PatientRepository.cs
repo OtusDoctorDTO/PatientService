@@ -1,4 +1,7 @@
-﻿using PatientService.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PatientService.Data.Context;
+using PatientService.Domain.Entities;
+using PatientService.Domain.Repositories;
 
 namespace PatientService.Data.Repositories
 {
@@ -11,20 +14,24 @@ namespace PatientService.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Patient> GetAll()
+        public async Task UpdatePatient(int id)
         {
-            return _dbContext.Patients.ToList();
+            var patient = await _dbContext.Patients.FindAsync(id);
+            if (patient != null)
+            {
+                _dbContext.Patients.Update(patient);
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
-        public Patient GetById(int id)
+        public async Task DeletePatient(int id)
         {
-            return _dbContext.Patients.FirstOrDefault(p => p.Id == id);
-        }
-
-        public void Add(Patient patient)
-        {
-            _dbContext.Patients.Add(patient);
-            _dbContext.SaveChanges();
+            var patient = await _dbContext.Patients.FindAsync(id);
+            if (patient != null)
+            {
+                _dbContext.Patients.Remove(patient);
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }

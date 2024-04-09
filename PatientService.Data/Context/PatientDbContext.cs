@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PatientService.Data.Entities;
 
-namespace PatientService.Data
+namespace PatientService.Data.Context
 {
     public class PatientDbContext : DbContext
     {

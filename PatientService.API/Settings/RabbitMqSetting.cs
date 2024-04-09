@@ -1,6 +1,6 @@
-﻿namespace PatientService.API.Consumer
+﻿namespace PatientService.API.Settings
 {
-    public class RabbitMqSettings
+    public class RabbitMqSetting
     {
         public string Host { get; set; }
         public string VirtualHost { get; set; }
