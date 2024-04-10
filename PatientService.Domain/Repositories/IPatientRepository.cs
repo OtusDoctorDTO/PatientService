@@ -5,7 +5,7 @@ namespace PatientService.Domain.Repositories
 {
     public interface IPatientRepository
     {
-        Task UpdatePatient(int id);
-        Task DeletePatient(int id);
+        Task UpdatePatient(Guid id);
+        Task DeletePatient(Guid id);
     }
 }

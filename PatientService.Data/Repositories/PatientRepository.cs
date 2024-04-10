@@ -14,7 +14,7 @@ namespace PatientService.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task UpdatePatient(int id)
+        public async Task UpdatePatient(Guid id)
         {
             var patient = await _dbContext.Patients.FindAsync(id);
             if (patient != null)
@@ -24,7 +24,7 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task DeletePatient(int id)
+        public async Task DeletePatient(Guid id)
         {
             var patient = await _dbContext.Patients.FindAsync(id);
             if (patient != null)

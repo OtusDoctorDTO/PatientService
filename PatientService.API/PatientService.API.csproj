@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Consumer\**" />
+    <Content Remove="Consumer\**" />
+    <EmbeddedResource Remove="Consumer\**" />
+    <None Remove="Consumer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="HelpersDTO" Version="1.0.2" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.0" />
@@ -20,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Consumer\" />
+    <Folder Include="Consumers\" />
   </ItemGroup>
 
 </Project>
