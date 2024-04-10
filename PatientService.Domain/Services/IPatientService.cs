@@ -1,4 +1,5 @@
-﻿using PatientService.Domain.Entities;
+﻿using HelpersDTO.CallCenter.DTO.Models;
+using PatientService.Domain.Entities;
 
 namespace PatientService.Domain.Services
 {
@@ -6,7 +7,7 @@ namespace PatientService.Domain.Services
     public interface IPatientService
     {
         Task<Patient?> GetPatientById(Guid id);
-        Task AddPatient(Patient patient);
+        Task<Guid> AddPatient(PatientDto patient);
 
     }
 }

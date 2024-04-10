@@ -19,7 +19,7 @@ namespace PatientService.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Patient> GetPatientById(int id)
+        public ActionResult<Patient> GetPatientById(Guid id)
         {
             try
             {
