@@ -7,11 +7,11 @@ namespace PatientService.Data.Context
     public class PatientDbContext : DbContext
     {
         public DbSet<PatientDto> Patients { get; set; }
-        // Add DbSet properties for other entities (e.g., Appointments, MedicalRecords)
 
         public PatientDbContext(DbContextOptions<PatientDbContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
