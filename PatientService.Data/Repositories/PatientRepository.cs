@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+
+using HelpersDTO.CallCenter.DTO.Models;
 using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
@@ -32,6 +34,18 @@ namespace PatientService.Data.Repositories
                 _dbContext.Patients.Remove(patient);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        public async Task<PatientDto> AddPatient(PatientDto patient)
+        {
+            _dbContext.Patients.Add(patient);
+            await _dbContext.SaveChangesAsync();
+            return patient;
+        }
+
+        public async Task<PatientDto> GetPatientByIdAsync(Guid id)
+        {
+            return await _dbContext.Patients.FindAsync(id);
         }
     }
 }
