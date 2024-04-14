@@ -1,13 +1,13 @@
-﻿using HelpersDTO.CallCenter.DTO.Models;
-using PatientService.Domain.Entities;
+﻿using PatientService.Domain.Entities;
 
 namespace PatientService.Domain.Repositories
 {
     public interface IPatientRepository
     {
-        Task<PatientDto> AddPatient(PatientDto patient);
-        Task<PatientDto> GetPatientByIdAsync(Guid id);
-        Task UpdatePatient(Guid id);
-        Task DeletePatient(Guid id);
+        Task<Patient> AddPatientAsync(Patient patient);
+        Task<Patient> GetPatientByIdAsync(Guid id);
+        Task UpdatePatientAsync(Guid id);
+        Task DeletePatientAsync(Guid id);
+        Task<IEnumerable<Patient>> GetAllPatientsAsync();
     }
 }

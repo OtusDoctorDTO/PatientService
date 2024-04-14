@@ -19,16 +19,18 @@ namespace PatientService.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Patient> GetPatientById(Guid id)
+        [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Patient>> GetPatientById(Guid id)
         {
             try
             {
-                var patient = _patientService.GetPatientById(id);
+                var patient = await _patientService.GetPatientById(id);
                 if (patient == null)
                 {
                     return NotFound();
                 }
-                return Ok(patient);
+                return patient;
             }
             catch (Exception ex)
             {
@@ -36,6 +38,20 @@ namespace PatientService.API.Controllers
                 return BadRequest();
             }
             
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPatientAsync(Patient patient)
+        {
+            if (patient == null)
+            {
+                return BadRequest("Patient data is missing.");
+            }
+
+            // Вызываем метод сервиса для добавления пациента
+            await _patientService.AddPatient(patient);
+
+            return Ok("Patient added successfully.");
         }
 
     }

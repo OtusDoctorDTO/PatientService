@@ -16,17 +16,17 @@ namespace PatientService.Domain.Services
             _repository = repository;
         }
 
-        public Task<PatientDto> GetPatientById(Guid id)
+        public async Task<Patient> GetPatientById(Guid id)
         {
-            throw new NotImplementedException();
+            return await _repository.GetPatientByIdAsync(id);
         }
 
-        public async Task<PatientDto> AddPatient(PatientDto patient)
+        public async Task<Patient> AddPatient(Patient patient)
         {
             try
             {
                 // Add logic to save the patient to the database using the repository
-                var newPatient = await _repository.AddPatient(patient);
+                var newPatient = await _repository.AddPatientAsync(patient);
 
                 _logger.LogInformation("Patient added successfully: {PatientId}", newPatient);
                 return newPatient;
@@ -34,7 +34,7 @@ namespace PatientService.Domain.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding the patient");
-                throw; // Rethrow the exception to be handled by the caller
+                throw;
             }
         }
     }

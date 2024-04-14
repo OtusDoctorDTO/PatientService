@@ -6,8 +6,8 @@ namespace PatientService.Domain.Services
     //Интерфейс, определяющий операции, связанные с пациентами.
     public interface IPatientService
     {
-        Task<PatientDto?> GetPatientById(Guid id);
-        Task<PatientDto> AddPatient(PatientDto patient);
+        Task<Patient> GetPatientById(Guid id);
+        Task<Patient> AddPatient(Patient patient);
 
     }
 }
