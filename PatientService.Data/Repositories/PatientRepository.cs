@@ -1,7 +1,4 @@
-﻿
-
-using HelpersDTO.CallCenter.DTO.Models;
-using PatientService.Data.Context;
+﻿using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
 
@@ -16,7 +13,7 @@ namespace PatientService.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task UpdatePatient(Guid id)
+        public async Task UpdatePatientAsync(Guid id)
         {
             var patient = await _dbContext.Patients.FindAsync(id);
             if (patient != null)
@@ -26,7 +23,7 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task DeletePatient(Guid id)
+        public async Task DeletePatientAsync(Guid id)
         {
             var patient = await _dbContext.Patients.FindAsync(id);
             if (patient != null)
@@ -36,16 +33,21 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task<PatientDto> AddPatient(PatientDto patient)
+        public async Task<Patient> AddPatientAsync(Patient patient)
         {
             _dbContext.Patients.Add(patient);
             await _dbContext.SaveChangesAsync();
             return patient;
         }
 
-        public async Task<PatientDto> GetPatientByIdAsync(Guid id)
+        public async Task<Patient> GetPatientByIdAsync(Guid id)
         {
             return await _dbContext.Patients.FindAsync(id);
+        }
+
+        public Task<IEnumerable<Patient>> GetAllPatientsAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -41,14 +41,27 @@ namespace PatientService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddPatientAsync(Patient patient)
+        public async Task<IActionResult> AddPatientAsync(string firstName, string lastName, DateTime dateOfBirth, int phoneNumber)
         {
+            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            {
+                return BadRequest("Missing required parameters.");
+            }
+
+            // Создаем нового пациента с переданными параметрами
+            var patient = new Patient
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                PhoneNumber = phoneNumber
+            };
+
             if (patient == null)
             {
                 return BadRequest("Patient data is missing.");
             }
 
-            // Вызываем метод сервиса для добавления пациента
             await _patientService.AddPatient(patient);
 
             return Ok("Patient added successfully.");

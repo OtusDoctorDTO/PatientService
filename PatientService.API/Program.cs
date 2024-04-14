@@ -5,8 +5,10 @@ using PatientService.API.Consumers;
 using PatientService.API.Settings;
 using PatientService.Data.Context;
 using PatientService.Data.Repositories;
+using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
 using PatientService.Domain.Services;
+using System;
 using System.Transactions;
 
 namespace PatientService.API
@@ -25,51 +27,43 @@ namespace PatientService.API
             if (configuration.Get<ApplicationSettings>() is not ApplicationSettings receptionConfig)
                 throw new ConfigurationException("Ошибка при подключении к ApplicationSettings");
 
-            string connection = configuration!.GetConnectionString("DefaultConnection");
-            if (string.IsNullOrEmpty(connection))
-                throw new ConfigurationException("Ошибка подключения");
+            builder.Services.AddDbContext<PatientDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddDbContext<PatientDbContext>(options =>
-                        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
-            builder.Services.AddTransient<IPatientRepository, PatientRepository>();
-            //builder.Services.AddTransient<IPatientService, PatientService>();
-
-            // Add services to the container.
-            builder.Services.AddControllers();
-
-            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Patient Service", Version = "v1" });
             });
 
-            builder.Services.AddMassTransit(x =>
-            {
-                x.AddConsumer<PatientConsumer>();
+            //// Add services to the container.
+            builder.Services.AddControllers();
 
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.Host(receptionConfig.RabbitMqSetting.Host, receptionConfig.RabbitMqSetting.Port, receptionConfig.RabbitMqSetting.Path, h =>
-                    {
-                        h.Username(receptionConfig.RabbitMqSetting.Username);
-                        h.Password(receptionConfig.RabbitMqSetting.Password);
-                    });
+            //builder.Services.AddEndpointsApiExplorer();
 
-                    cfg.UseTransaction(_ =>
-                    {
-                        _.Timeout = TimeSpan.FromSeconds(60);
-                        _.IsolationLevel = IsolationLevel.ReadCommitted;
-                    });
+            //builder.Services.addmasstransit(x =>
+            //{
+            //    x.addconsumer<patientconsumer>();
 
-                    cfg.ReceiveEndpoint(new TemporaryEndpointDefinition(), e =>
-                    {
-                        e.ConfigureConsumer<PatientConsumer>(context);
-                    });
-                    cfg.ConfigureEndpoints(context);
-                });
-            });
+            //    x.usingrabbitmq((context, cfg) =>
+            //    {
+            //        cfg.host(receptionconfig.rabbitmqsetting.host, receptionconfig.rabbitmqsetting.port, receptionconfig.rabbitmqsetting.path, h =>
+            //        {
+            //            h.username(receptionconfig.rabbitmqsetting.username);
+            //            h.password(receptionconfig.rabbitmqsetting.password);
+            //        });
+
+            //        cfg.usetransaction(_ =>
+            //        {
+            //            _.timeout = timespan.fromseconds(60);
+            //            _.isolationlevel = isolationlevel.readcommitted;
+            //        });
+
+            //        cfg.receiveendpoint(new temporaryendpointdefinition(), e =>
+            //        {
+            //            e.configureconsumer<patientconsumer>(context);
+            //        });
+            //        cfg.configureendpoints(context);
+            //    });
+            //});
 
             var app = builder.Build();
 
@@ -81,9 +75,11 @@ namespace PatientService.API
                 {
                     c.RouteTemplate = "/swagger/{documentName}/swagger.json";
                 });
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patient Service v1"));
             }
             app.UseHttpsRedirection();
+
+            app.UseRouting();
 
             app.UseAuthorization();
 

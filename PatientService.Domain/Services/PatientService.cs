@@ -25,7 +25,6 @@ namespace PatientService.Domain.Services
         {
             try
             {
-                // Add logic to save the patient to the database using the repository
                 var newPatient = await _repository.AddPatientAsync(patient);
 
                 _logger.LogInformation("Patient added successfully: {PatientId}", newPatient);

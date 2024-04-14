@@ -17,23 +17,23 @@ namespace PatientService.API.Consumers
 
         public async Task Consume(ConsumeContext<SavePatientDTORequest> context)
         {
-            logger.LogInformation("Получен запрос SavePatientDTORequest {message}", context.Message);
-            var result = new SavePatientDTOResponse()
-            {
-                Guid = context.Message.Guid,
-                Success = true,
-                ConnectionId = context.Message.ConnectionId
-            };
-            try
-            {
-                await service.AddPatient(context.Message.Patient);
-                result.Success = true; 
-            }
-            catch (System.Exception e)
-            {
-                logger.LogError(e, "При сохранении пациента произошла ошибка");
-            }
-            await context.RespondAsync(result);
+            //logger.LogInformation("Получен запрос SavePatientDTORequest {message}", context.Message);
+            //var result = new SavePatientDTOResponse()
+            //{
+            //    Guid = context.Message.Guid,
+            //    Success = true,
+            //    ConnectionId = context.Message.ConnectionId
+            //};
+            //try
+            //{
+            //    await service.AddPatient(context.Message.Patient);
+            //    result.Success = true; 
+            //}
+            //catch (System.Exception e)
+            //{
+            //    logger.LogError(e, "При сохранении пациента произошла ошибка");
+            //}
+            //await context.RespondAsync(result);
         }
     }
 
