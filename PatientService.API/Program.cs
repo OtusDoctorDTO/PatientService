@@ -1,15 +1,12 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using PatientService.API.Consumers;
 using PatientService.API.Settings;
 using PatientService.Data.Context;
 using PatientService.Data.Repositories;
-using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
 using PatientService.Domain.Services;
-using System;
 using System.Transactions;
 
 namespace PatientService.API
@@ -27,13 +24,13 @@ namespace PatientService.API
                 .Build();
 
             if (configuration.Get<ApplicationSettings>() is not ApplicationSettings receptionConfig)
-                throw new ConfigurationException("Ошибка при подключении к ApplicationSettings");
+                throw new ConfigurationException("Error connecting to ApplicationSettings");
 
             var rabbitMqSettings = configuration.GetSection("RabbitMQ").Get<RabbitMqSetting>();
 
 
             builder.Services.AddTransient<IPatientRepository, PatientRepository>();
-            builder.Services.AddTransient<IPatientService, PatientService.Domain.Services.PatientService>();
+            builder.Services.AddTransient<IPatientService, Domain.Services.PatientService>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<PatientDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
@@ -69,8 +66,6 @@ namespace PatientService.API
                     cfg.ConfigureEndpoints(context);
                 });
             });
-
-            //builder.Services.AddMassTransitHostedService();
 
             var app = builder.Build();
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PatientService.API.Consumers;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Services;
+using Microsoft.IdentityModel.Tokens;
 
 namespace PatientService.API.Controllers
 {
@@ -14,7 +15,6 @@ namespace PatientService.API.Controllers
     {
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
-        private readonly IPublishEndpoint _publishEndpoint; // Механизм для отправки сообщений
         IRequestClient<SavePatientDTORequest> _client;
 
         public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client)
@@ -31,7 +31,7 @@ namespace PatientService.API.Controllers
         {
             try
             {
-                var patient = await _patientService.GetPatientById(id);
+                var patient = await _patientService.GetById(id);
                 if (patient == null)
                 {
                     return NotFound();
@@ -47,33 +47,32 @@ namespace PatientService.API.Controllers
         }
 
         [HttpPost("Add")]
-        public async Task<IActionResult> AddPatientAsync(string firstName, string lastName, DateTime dateOfBirth, string phoneNumber)
+        public async Task<IActionResult> AddPatientAsync(Patient patient)
         {
-            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            try
             {
-                return BadRequest("Missing required parameters.");
+                if (patient == null)
+                {
+                    return BadRequest("Пациент не заполнен.");
+                }
+
+                if (string.IsNullOrEmpty(patient.LastName) || string.IsNullOrEmpty(patient.FirstName))
+                {
+                    return BadRequest("Обязательные поля Имя и Фамилия не заполнены.");
+                }
+
+                await _patientService.AddAsync(patient);
+
+                return Ok("Пациент успешно добавлен.");
             }
-
-            // Создаем нового пациента с переданными параметрами
-            var patient = new Patient
+            catch (Exception e)
             {
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth.ToUniversalTime(),
-                PhoneNumber = phoneNumber
-            };
-
-            if (patient == null)
-            {
-                return BadRequest("Patient data is missing.");
+                _logger.LogError(e, "Произошла ошибка Add");
+                return BadRequest();
             }
-
-            await _patientService.AddPatientAsync(patient);
-
-            return Ok("Patient added successfully.");
         }
 
-        [HttpPost("Create")]
+        [HttpPost("CreateTest")]
         public async Task<IActionResult> CreatePatient(PatientDto pacientDTO)
         {
             try

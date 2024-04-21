@@ -15,16 +15,16 @@ namespace PatientService.Domain.Services
             _repository = repository;
         }
 
-        public async Task<Patient> GetPatientById(Guid id)
+        public async Task<Patient> GetById(Guid id)
         {
-            return await _repository.GetPatientByIdAsync(id);
+            return await _repository.GetByIdAsync(id);
         }
 
-        public async Task<Patient> AddPatientAsync(Patient patient)
+        public async Task<Patient> AddAsync(Patient patient)
         {
             try
             {
-                var newPatient = await _repository.AddPatientAsync(patient);
+                var newPatient = await _repository.AddAsync(patient);
 
                 _logger.LogInformation("Patient added successfully: {PatientId}", newPatient);
                 return newPatient;
@@ -38,17 +38,17 @@ namespace PatientService.Domain.Services
 
         public async Task<IEnumerable<Patient>> GetAllAsync()
         {
-            return await _repository.GetAllPatientsAsync();
+            return await _repository.GetAllAsync();
         }
 
         public async Task UpdateAsync(Guid id)
         {
-            await _repository.UpdatePatientAsync(id);
+            await _repository.UpdateAsync(id);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            await _repository.DeletePatientAsync(id);
+            await _repository.DeleteAsync(id);
         }
     }
 }

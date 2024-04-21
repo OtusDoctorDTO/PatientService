@@ -8,9 +8,6 @@
 
   <ItemGroup>
     <Compile Remove="Consumer\**" />
-    <Content Remove="Consumer\**" />
-    <EmbeddedResource Remove="Consumer\**" />
-    <None Remove="Consumer\**" />
   </ItemGroup>
 
   <ItemGroup>
