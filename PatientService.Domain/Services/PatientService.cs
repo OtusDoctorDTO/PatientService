@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
-using HelpersDTO.CallCenter.DTO.Models;
 
 namespace PatientService.Domain.Services
 {
@@ -21,7 +20,7 @@ namespace PatientService.Domain.Services
             return await _repository.GetPatientByIdAsync(id);
         }
 
-        public async Task<Patient> AddPatient(Patient patient)
+        public async Task<Patient> AddPatientAsync(Patient patient)
         {
             try
             {
@@ -35,6 +34,21 @@ namespace PatientService.Domain.Services
                 _logger.LogError(ex, "An error occurred while adding the patient");
                 throw;
             }
+        }
+
+        public async Task<IEnumerable<Patient>> GetAllAsync()
+        {
+            return await _repository.GetAllPatientsAsync();
+        }
+
+        public async Task UpdateAsync(Guid id)
+        {
+            await _repository.UpdatePatientAsync(id);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            await _repository.DeletePatientAsync(id);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PatientService.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
 
@@ -35,7 +36,7 @@ namespace PatientService.Data.Repositories
 
         public async Task<Patient> AddPatientAsync(Patient patient)
         {
-            _dbContext.Patients.Add(patient);
+            _dbContext.Patients.AddAsync(patient);
             await _dbContext.SaveChangesAsync();
             return patient;
         }
@@ -45,9 +46,9 @@ namespace PatientService.Data.Repositories
             return await _dbContext.Patients.FindAsync(id);
         }
 
-        public Task<IEnumerable<Patient>> GetAllPatientsAsync()
+        public async Task<IEnumerable<Patient>> GetAllPatientsAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Patients.ToListAsync();
         }
     }
 }

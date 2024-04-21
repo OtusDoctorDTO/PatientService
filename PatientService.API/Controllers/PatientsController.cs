@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using MassTransit;
+using Microsoft.AspNetCore.Mvc;
+using PatientService.API.Consumers;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Services;
 
@@ -11,6 +12,7 @@ namespace PatientService.API.Controllers
     {
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
+        private readonly IPublishEndpoint _publishEndpoint; // Механизм для отправки сообщений
 
         public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
         {
@@ -37,11 +39,11 @@ namespace PatientService.API.Controllers
                 _logger.LogError(ex, "Произошла ошибка GetPatientById");
                 return BadRequest();
             }
-            
+
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddPatientAsync(string firstName, string lastName, DateTime dateOfBirth, int phoneNumber)
+        public async Task<IActionResult> AddPatientAsync(string firstName, string lastName, DateTime dateOfBirth, string phoneNumber)
         {
             if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
             {
@@ -53,7 +55,7 @@ namespace PatientService.API.Controllers
             {
                 FirstName = firstName,
                 LastName = lastName,
-                DateOfBirth = dateOfBirth,
+                DateOfBirth = dateOfBirth.ToUniversalTime(),
                 PhoneNumber = phoneNumber
             };
 
@@ -62,9 +64,34 @@ namespace PatientService.API.Controllers
                 return BadRequest("Patient data is missing.");
             }
 
-            await _patientService.AddPatient(patient);
+            await _patientService.AddPatientAsync(patient);
 
             return Ok("Patient added successfully.");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePatient(string firstName, string lastName, DateTime dateOfBirth, string phoneNumber)
+        {
+
+            var patient = new Patient
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth.ToUniversalTime(),
+                PhoneNumber = phoneNumber
+            };
+
+            if (patient == null)
+            {
+                return BadRequest("Patient data is missing.");
+            }
+
+            await _patientService.AddPatientAsync(patient); // Добавление пациента через сервис
+
+            // Отправка сообщения через Consumer для создания пациента
+            await _publishEndpoint.Publish<Patient>(new { PatientId = patient.Id, Name = patient.FirstName });
+
+            return Ok();
         }
 
     }

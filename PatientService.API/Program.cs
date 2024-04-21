@@ -1,5 +1,6 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using PatientService.API.Consumers;
 using PatientService.API.Settings;
@@ -18,6 +19,7 @@ namespace PatientService.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false, true)
@@ -27,6 +29,11 @@ namespace PatientService.API
             if (configuration.Get<ApplicationSettings>() is not ApplicationSettings receptionConfig)
                 throw new ConfigurationException("Ошибка при подключении к ApplicationSettings");
 
+            var rabbitMqSettings = configuration.GetSection("RabbitMQ").Get<RabbitMqSetting>();
+
+
+            builder.Services.AddTransient<IPatientRepository, PatientRepository>();
+            builder.Services.AddTransient<IPatientService, PatientService.Domain.Services.PatientService>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<PatientDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
@@ -35,33 +42,35 @@ namespace PatientService.API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Patient Service", Version = "v1" });
             });
 
-            //builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddEndpointsApiExplorer();
 
-            //builder.Services.addmasstransit(x =>
-            //{
-            //    x.addconsumer<patientconsumer>();
+            builder.Services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PatientConsumer>();
 
-            //    x.usingrabbitmq((context, cfg) =>
-            //    {
-            //        cfg.host(receptionconfig.rabbitmqsetting.host, receptionconfig.rabbitmqsetting.port, receptionconfig.rabbitmqsetting.path, h =>
-            //        {
-            //            h.username(receptionconfig.rabbitmqsetting.username);
-            //            h.password(receptionconfig.rabbitmqsetting.password);
-            //        });
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(rabbitMqSettings.Host, rabbitMqSettings.Port, "/", h =>
+                    {
+                        h.Username(rabbitMqSettings.Username);
+                        h.Password(rabbitMqSettings.Password);
+                    });
 
-            //        cfg.usetransaction(_ =>
-            //        {
-            //            _.timeout = timespan.fromseconds(60);
-            //            _.isolationlevel = isolationlevel.readcommitted;
-            //        });
+                    cfg.UseTransaction(_ =>
+                    {
+                        _.Timeout = TimeSpan.FromSeconds(60);
+                        _.IsolationLevel = IsolationLevel.ReadCommitted;
+                    });
 
-            //        cfg.receiveendpoint(new temporaryendpointdefinition(), e =>
-            //        {
-            //            e.configureconsumer<patientconsumer>(context);
-            //        });
-            //        cfg.configureendpoints(context);
-            //    });
-            //});
+                    cfg.ReceiveEndpoint(new TemporaryEndpointDefinition(), e =>
+                    {
+                        e.ConfigureConsumer<PatientConsumer>(context);
+                    });
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
+
+            //builder.Services.AddMassTransitHostedService();
 
             var app = builder.Build();
 

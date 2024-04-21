@@ -7,7 +7,9 @@ namespace PatientService.Domain.Services
     public interface IPatientService
     {
         Task<Patient> GetPatientById(Guid id);
-        Task<Patient> AddPatient(Patient patient);
-
+        Task<Patient> AddPatientAsync(Patient patient);
+        Task<IEnumerable<Patient>> GetAllAsync();
+        Task UpdateAsync(Guid id);
+        Task DeleteAsync(Guid id);
     }
 }

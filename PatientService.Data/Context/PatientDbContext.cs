@@ -12,11 +12,5 @@ namespace PatientService.Data.Context
         {
             
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Configure entity mappings and relationships
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(PatientDbContext).Assembly);
-        }
     }
 }
