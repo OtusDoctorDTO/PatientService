@@ -27,15 +27,13 @@ namespace PatientService.API
             if (configuration.Get<ApplicationSettings>() is not ApplicationSettings receptionConfig)
                 throw new ConfigurationException("Ошибка при подключении к ApplicationSettings");
 
-            builder.Services.AddDbContext<PatientDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<PatientDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Patient Service", Version = "v1" });
             });
-
-            //// Add services to the container.
-            builder.Services.AddControllers();
 
             //builder.Services.AddEndpointsApiExplorer();
 

@@ -10,14 +10,6 @@ namespace PatientService.Domain.Entities
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public int PhoneNumber { get; set; }
-        /// <summary>
-        /// Данные документа
-        /// </summary>
-        public DocumentDTO Document { get; set; }
-        public List<ContactDTO> Contacts { get; set; }
-        /// <summary>
-        /// Статус пациента
-        /// </summary>
-        public RelevanceStatusEnum Status { get; set; } = RelevanceStatusEnum.New;
+
     }
 }
