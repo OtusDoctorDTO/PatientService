@@ -1,4 +1,6 @@
-﻿using MassTransit;
+﻿using HelpersDTO.CallCenter.DTO.Models;
+using HelpersDTO.CallCenter.DTO;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using PatientService.API.Consumers;
 using PatientService.Domain.Entities;
@@ -13,11 +15,13 @@ namespace PatientService.API.Controllers
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
         private readonly IPublishEndpoint _publishEndpoint; // Механизм для отправки сообщений
+        IRequestClient<SavePatientDTORequest> _client;
 
-        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client)
         {
             _patientService = patientService;
             _logger = logger;
+            _client = client;
         }
 
         [HttpGet("{id}")]
@@ -42,7 +46,7 @@ namespace PatientService.API.Controllers
 
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<IActionResult> AddPatientAsync(string firstName, string lastName, DateTime dateOfBirth, string phoneNumber)
         {
             if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
@@ -69,29 +73,24 @@ namespace PatientService.API.Controllers
             return Ok("Patient added successfully.");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreatePatient(string firstName, string lastName, DateTime dateOfBirth, string phoneNumber)
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreatePatient(PatientDto pacientDTO)
         {
-
-            var patient = new Patient
+            try
             {
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth.ToUniversalTime(),
-                PhoneNumber = phoneNumber
-            };
-
-            if (patient == null)
-            {
-                return BadRequest("Patient data is missing.");
+                var responce = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
+                {
+                    Patient = pacientDTO,
+                    Guid = Guid.NewGuid()
+                });
+                _logger.LogInformation("Получен ответ {responce}", responce.Message);
+                return Ok(responce.Message.Id);
             }
-
-            await _patientService.AddPatientAsync(patient); // Добавление пациента через сервис
-
-            // Отправка сообщения через Consumer для создания пациента
-            await _publishEndpoint.Publish<Patient>(new { PatientId = patient.Id, Name = patient.FirstName });
-
-            return Ok();
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Произошла ошибка Add");
+                return BadRequest();
+            }
         }
 
     }
