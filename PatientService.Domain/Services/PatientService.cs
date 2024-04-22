@@ -26,12 +26,12 @@ namespace PatientService.Domain.Services
             {
                 var newPatient = await _repository.AddAsync(patient);
 
-                _logger.LogInformation("Patient added successfully: {PatientId}", newPatient);
+                _logger.LogInformation("Пациент успешно добавлен: {PatientId}", newPatient);
                 return newPatient;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while adding the patient");
+                _logger.LogError(ex, "Произошла ошибка при добавлении пациента.");
                 throw;
             }
         }
