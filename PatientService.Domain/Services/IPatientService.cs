@@ -1,12 +1,15 @@
-﻿using PatientService.Domain.Entities;
+﻿using HelpersDTO.CallCenter.DTO.Models;
+using PatientService.Domain.Entities;
 
 namespace PatientService.Domain.Services
 {
     //Интерфейс, определяющий операции, связанные с пациентами.
     public interface IPatientService
     {
-        Task<Patient?> GetPatientById(int id);
-        Task AddPatient(Patient patient);
-
+        Task<Patient> GetById(Guid id);
+        Task<Patient> AddAsync(Patient patient);
+        Task<IEnumerable<Patient>> GetAllAsync();
+        Task UpdateAsync(Guid id);
+        Task DeleteAsync(Guid id);
     }
 }

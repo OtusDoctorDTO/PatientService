@@ -14,7 +14,7 @@ namespace PatientService.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task UpdatePatient(int id)
+        public async Task UpdateAsync(Guid id)
         {
             var patient = await _dbContext.Patients.FindAsync(id);
             if (patient != null)
@@ -24,7 +24,7 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task DeletePatient(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var patient = await _dbContext.Patients.FindAsync(id);
             if (patient != null)
@@ -32,6 +32,23 @@ namespace PatientService.Data.Repositories
                 _dbContext.Patients.Remove(patient);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        public async Task<Patient> AddAsync(Patient patient)
+        {
+            await _dbContext.Patients.AddAsync(patient);
+            await _dbContext.SaveChangesAsync();
+            return patient;
+        }
+
+        public async Task<Patient> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.Patients.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<Patient>> GetAllAsync()
+        {
+            return await _dbContext.Patients.ToListAsync();
         }
     }
 }
