@@ -1,5 +1,4 @@
 using MassTransit;
-using MassTransit.NewIdProviders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using PatientService.API.Consumers;
