@@ -22,6 +22,7 @@ namespace PatientService.API
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false, true)
                 .AddJsonFile($"appsettings.Development.json", false, true)
+                .AddEnvironmentVariables()
                 .Build();
 
             if (configuration.Get<ApplicationSettings>() is not ApplicationSettings receptionConfig)
