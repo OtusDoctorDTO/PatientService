@@ -1,5 +1,4 @@
-﻿using HelpersDTO.CallCenter.DTO.Models;
-using PatientService.Domain.Entities;
+﻿using PatientService.Domain.Entities;
 
 namespace PatientService.Domain.Services
 {

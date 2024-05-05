@@ -1,6 +1,5 @@
 ﻿using HelpersDTO.CallCenter.DTO;
 using MassTransit;
-using PatientService.Domain.Entities;
 using PatientService.Domain.Services;
 
 namespace PatientService.API.Consumers

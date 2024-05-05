@@ -2,10 +2,8 @@
 using HelpersDTO.CallCenter.DTO;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using PatientService.API.Consumers;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Services;
-using Microsoft.IdentityModel.Tokens;
 
 namespace PatientService.API.Controllers
 {

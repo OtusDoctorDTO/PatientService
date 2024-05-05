@@ -1,7 +1,4 @@
-﻿using HelpersDTO.Base.Models;
-using HelpersDTO.CallCenter.DTO.Models;
-
-namespace PatientService.Domain.Entities
+﻿namespace PatientService.Domain.Entities
 {
     public class Patient
     {
