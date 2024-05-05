@@ -1,4 +1,5 @@
 using MassTransit;
+using MassTransit.NewIdProviders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using PatientService.API.Consumers;
@@ -20,14 +21,14 @@ namespace PatientService.API
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile("appsettings.Development.json", true)
+                .AddJsonFile($"appsettings.Development.json", false, true)
                 .Build();
 
             if (configuration.Get<ApplicationSettings>() is not ApplicationSettings receptionConfig)
                 throw new ConfigurationException("Error connecting to ApplicationSettings");
 
             var rabbitMqSettings = configuration.GetSection("RabbitMQ").Get<RabbitMqSetting>();
-
+            ArgumentNullException.ThrowIfNull(rabbitMqSettings);
 
             builder.Services.AddTransient<IPatientRepository, PatientRepository>();
             builder.Services.AddTransient<IPatientService, Domain.Services.PatientService>();

@@ -12,4 +12,4 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /PatientService
 COPY --from=base PatientService/publish ./
 EXPOSE 8080
-ENTRYPOINT [ "dotnet", "PatientService.API.dll" ]
+ENTRYPOINT [ "dotnet", "PatientService.API.dll", "--environment=Test" ]
