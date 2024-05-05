@@ -21,7 +21,7 @@ namespace PatientService.API
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile($"appsettings.Development.json", false, true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", false, true)
                 .AddEnvironmentVariables()
                 .Build();
 
