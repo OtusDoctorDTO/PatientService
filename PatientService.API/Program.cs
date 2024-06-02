@@ -32,8 +32,8 @@ namespace PatientService.API
 
             builder.Services.AddTransient<IPatientRepository, PatientRepository>();
             builder.Services.AddTransient<IPatientService, Domain.Services.PatientService>();
-            builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<PatientDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddControllers();
+            builder.Services.AddDbContext<PatientDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddSwaggerGen(c =>
             {
