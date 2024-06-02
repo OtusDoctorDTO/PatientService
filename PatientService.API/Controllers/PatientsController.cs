@@ -22,7 +22,7 @@ namespace PatientService.API.Controllers
             _client = client;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{userid}")]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Patient>> GetPatientById(Guid id)
@@ -54,11 +54,6 @@ namespace PatientService.API.Controllers
                     return BadRequest("Пациент не заполнен.");
                 }
 
-                if (string.IsNullOrEmpty(patient.LastName) || string.IsNullOrEmpty(patient.FirstName))
-                {
-                    return BadRequest("Обязательные поля Имя и Фамилия не заполнены.");
-                }
-
                 await _patientService.AddAsync(patient);
 
                 return Ok("Пациент успешно добавлен.");
@@ -71,13 +66,13 @@ namespace PatientService.API.Controllers
         }
 
         [HttpPost("CreateTest")]
-        public async Task<IActionResult> CreatePatient(PatientDto pacientDTO)
+        public async Task<IActionResult> CreatePatient(PatientDto patientDTO)
         {
             try
             {
                 var responce = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
                 {
-                    Patient = pacientDTO,
+                    Patient = patientDTO,
                     Guid = Guid.NewGuid()
                 });
                 _logger.LogInformation("Получен ответ {responce}", responce.Message);
