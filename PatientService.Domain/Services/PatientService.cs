@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HelpersDTO.Patient.DTO;
+using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
+using System.Numerics;
 
 namespace PatientService.Domain.Services
 {
@@ -49,6 +51,22 @@ namespace PatientService.Domain.Services
         public async Task DeleteAsync(Guid id)
         {
             await _repository.DeleteAsync(id);
+        }
+
+        public async Task<List<PatientDTO>?> GetByIds(Guid[] usersId)
+        {
+            var patients = await _repository.GetByIds(usersId);
+            if (patients?.Any() ?? true) return null;
+            return patients!.Select(p => new PatientDTO()
+            {
+                Id = p.Id,
+                UserId = p.UserId,
+                LastName = p.LastName ?? "",
+                FirstName = p.FirstName ?? "",
+                MiddleName = p.MiddleName ?? "",
+                //IsNew = p.Documents?.Any() ?? false
+                //Status = 
+            }).ToList();
         }
     }
 }

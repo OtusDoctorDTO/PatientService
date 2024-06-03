@@ -1,4 +1,5 @@
-﻿using PatientService.Domain.Entities;
+﻿using HelpersDTO.Patient.DTO;
+using PatientService.Domain.Entities;
 
 namespace PatientService.Domain.Services
 {
@@ -10,5 +11,6 @@ namespace PatientService.Domain.Services
         Task<IEnumerable<Patient>> GetAllAsync();
         Task UpdateAsync(Guid id);
         Task DeleteAsync(Guid id);
+        Task<List<PatientDTO>?> GetByIds(Guid[] usersId);
     }
 }

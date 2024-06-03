@@ -2,6 +2,7 @@
 using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
+using System.Linq;
 
 namespace PatientService.Data.Repositories
 {
@@ -49,6 +50,14 @@ namespace PatientService.Data.Repositories
         public async Task<IEnumerable<Patient>> GetAllAsync()
         {
             return await _dbContext.Patients.ToListAsync();
+        }
+
+        public async Task<List<Patient>> GetByIds(Guid[] usersId)
+        {
+            return await _dbContext.Patients
+                .Include(p => p.Documents)
+                .Where(p => p.UserId != null && usersId.Any(userId => userId == p.UserId))
+                .ToListAsync();
         }
     }
 }

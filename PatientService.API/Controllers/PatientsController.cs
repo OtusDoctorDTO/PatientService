@@ -65,6 +65,21 @@ namespace PatientService.API.Controllers
             }
         }
 
+        [HttpPost("GetByIds")]
+        public async Task<IActionResult> GetByIdsAsync(Guid[] usersId)
+        {
+            try
+            {
+                var result = await _patientService.GetByIds(usersId);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Произошла ошибка Add");
+                return BadRequest();
+            }
+        }
+
         [HttpPost("CreateTest")]
         public async Task<IActionResult> CreatePatient(PatientDto patientDTO)
         {
