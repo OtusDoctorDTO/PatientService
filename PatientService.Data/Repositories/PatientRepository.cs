@@ -42,7 +42,7 @@ namespace PatientService.Data.Repositories
             return patient;
         }
 
-        public async Task<Patient> GetByIdAsync(Guid id)
+        public async Task<Patient?> GetByIdAsync(Guid id)
         {
             return await _dbContext.Patients.FindAsync(id);
         }
@@ -52,7 +52,7 @@ namespace PatientService.Data.Repositories
             return await _dbContext.Patients.ToListAsync();
         }
 
-        public async Task<List<Patient>> GetByIds(Guid[] usersId)
+        public async Task<List<Patient>?> GetByIds(Guid[] usersId)
         {
             return await _dbContext.Patients
                 .Include(p => p.Documents)

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
-using System.Numerics;
 
 namespace PatientService.Domain.Services
 {
@@ -17,12 +16,12 @@ namespace PatientService.Domain.Services
             _repository = repository;
         }
 
-        public async Task<Patient> GetById(Guid id)
+        public async Task<Patient?> GetById(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }
 
-        public async Task<Patient> AddAsync(Patient patient)
+        public async Task<Patient?> AddAsync(Patient patient)
         {
             try
             {
@@ -38,7 +37,7 @@ namespace PatientService.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Patient>> GetAllAsync()
+        public async Task<IEnumerable<Patient>?> GetAllAsync()
         {
             return await _repository.GetAllAsync();
         }
@@ -64,7 +63,7 @@ namespace PatientService.Domain.Services
                 LastName = p.LastName ?? "",
                 FirstName = p.FirstName ?? "",
                 MiddleName = p.MiddleName ?? "",
-                //IsNew = p.Documents?.Any() ?? false
+                IsNew = p.Documents?.Any() ?? false
                 //Status = 
             }).ToList();
         }
