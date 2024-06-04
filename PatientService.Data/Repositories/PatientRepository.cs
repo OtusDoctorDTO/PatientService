@@ -2,6 +2,7 @@
 using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
+using System.Linq;
 
 namespace PatientService.Data.Repositories
 {
@@ -34,14 +35,22 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task<Patient> AddAsync(Patient patient)
+        public async Task<bool> AddAsync(Patient patient)
         {
-            await _dbContext.Patients.AddAsync(patient);
-            await _dbContext.SaveChangesAsync();
-            return patient;
+            try
+            {
+                await _dbContext.Patients.AddAsync(patient);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                // залогировать
+            }
+            return false;
         }
 
-        public async Task<Patient> GetByIdAsync(Guid id)
+        public async Task<Patient?> GetByIdAsync(Guid id)
         {
             return await _dbContext.Patients.FindAsync(id);
         }
@@ -49,6 +58,14 @@ namespace PatientService.Data.Repositories
         public async Task<IEnumerable<Patient>> GetAllAsync()
         {
             return await _dbContext.Patients.ToListAsync();
+        }
+
+        public async Task<List<Patient>?> GetByIds(Guid[] usersId)
+        {
+            return await _dbContext.Patients
+                .Include(p => p.Documents)
+                .Where(p => p.UserId != null && usersId.Any(userId => userId == p.UserId))
+                .ToListAsync();
         }
     }
 }
