@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
+using System.Numerics;
 
 namespace PatientService.Domain.Services
 {
@@ -16,25 +17,41 @@ namespace PatientService.Domain.Services
             _repository = repository;
         }
 
-        public async Task<Patient?> GetById(Guid id)
+        public async Task<PatientDTO?> GetById(Guid id)
         {
-            return await _repository.GetByIdAsync(id);
+            var patient = await _repository.GetByIdAsync(id);
+            if (patient == null) return null;
+            return new PatientDTO()
+            {
+                FirstName = patient.FirstName,
+                LastName = patient.LastName,
+                MiddleName = patient.MiddleName,
+                Phone = patient.PhoneNumber,
+                UserId = patient.UserId,
+                IsNew = patient.IsNew
+            };
         }
 
-        public async Task<Patient?> AddAsync(Patient patient)
+        public async Task<bool> AddAsync(PatientDTO patient)
         {
             try
             {
-                var newPatient = await _repository.AddAsync(patient);
-
-                _logger.LogInformation("Пациент успешно добавлен: {PatientId}", newPatient);
-                return newPatient;
+                var patientDB = new Patient()
+                {
+                    FirstName = patient.FirstName,
+                    LastName = patient.LastName,
+                    MiddleName = patient.MiddleName,
+                    PhoneNumber = patient.Phone,
+                    UserId = patient.UserId,
+                    IsNew = patient.IsNew
+                };
+                return await _repository.AddAsync(patientDB);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Произошла ошибка при добавлении пациента.");
-                throw;
             }
+            return false;
         }
 
         public async Task<IEnumerable<Patient>?> GetAllAsync()
@@ -63,7 +80,7 @@ namespace PatientService.Domain.Services
                 LastName = p.LastName ?? "",
                 FirstName = p.FirstName ?? "",
                 MiddleName = p.MiddleName ?? "",
-                IsNew = p.Documents?.Any() ?? false
+                IsNew = p.IsNew
                 //Status = 
             }).ToList();
         }

@@ -35,11 +35,19 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task<Patient> AddAsync(Patient patient)
+        public async Task<bool> AddAsync(Patient patient)
         {
-            await _dbContext.Patients.AddAsync(patient);
-            await _dbContext.SaveChangesAsync();
-            return patient;
+            try
+            {
+                await _dbContext.Patients.AddAsync(patient);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                // залогировать
+            }
+            return false;
         }
 
         public async Task<Patient?> GetByIdAsync(Guid id)
