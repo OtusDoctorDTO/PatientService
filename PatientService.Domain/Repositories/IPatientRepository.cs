@@ -10,5 +10,6 @@ namespace PatientService.Domain.Repositories
         Task DeleteAsync(Guid id);
         Task<IEnumerable<Patient>> GetAllAsync();
         Task<List<Patient>?> GetByIds(Guid[] usersId);
+        Task<Patient> GetByUserIdAsync(Guid userId);
     }
 }

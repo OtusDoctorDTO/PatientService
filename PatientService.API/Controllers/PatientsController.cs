@@ -26,16 +26,18 @@ namespace PatientService.API.Controllers
         {
             try
             {
-                var patient = await _patientService.GetById(userId);
+                _logger.LogInformation("Получение данных пациента с ID: {UserId}", userId);
+                var patient = await _patientService.GetByUserIdAsync(userId);
                 if (patient == null)
                 {
+                    _logger.LogWarning("Пациент с ID: {UserId} не найден", userId);
                     return NotFound();
                 }
                 return Ok(patient);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Произошла ошибка GetPatientById");
+                _logger.LogError(ex, "Произошла ошибка при получении данных пациента с ID: {UserId}", userId);
                 return BadRequest();
             }
         }
@@ -47,21 +49,16 @@ namespace PatientService.API.Controllers
             {
                 if (patient == null)
                 {
+                    _logger.LogWarning("Попытка добавить пустого пациента");
                     return BadRequest("Пациент не заполнен.");
                 }
                 var result = await _patientService.AddAsync(patient);
-                if (result)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Не удалось добавить пациента.");
-                }
+                _logger.LogInformation("Пациент добавлен: {Result}", result);
+                return Ok(result);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Произошла ошибка Add");
+                _logger.LogError(e, "Произошла ошибка при добавлении пациента");
                 return BadRequest();
             }
         }
@@ -71,16 +68,13 @@ namespace PatientService.API.Controllers
         {
             try
             {
+                _logger.LogInformation("Получение данных пациентов по ID: {UserIds}", string.Join(", ", usersId));
                 var result = await _patientService.GetByIds(usersId);
-                if (result == null || !result.Any())
-                {
-                    return NotFound();
-                }
                 return Ok(result);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Произошла ошибка GetByIds");
+                _logger.LogError(e, "Произошла ошибка при получении данных пациентов по ID");
                 return BadRequest();
             }
         }
