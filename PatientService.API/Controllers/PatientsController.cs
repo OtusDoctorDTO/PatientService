@@ -1,5 +1,4 @@
-﻿using HelpersDTO.CallCenter.DTO.Models;
-using HelpersDTO.CallCenter.DTO;
+﻿using HelpersDTO.Patient;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using PatientService.Domain.Services;
@@ -8,44 +7,41 @@ using HelpersDTO.Patient.DTO;
 namespace PatientService.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class PatientsController : ControllerBase
     {
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
-        IRequestClient<SavePatientDTORequest> _client;
 
-        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
         {
             _patientService = patientService;
             _logger = logger;
-            _client = client;
         }
 
-        [HttpGet("{userid}")]
+        [HttpGet("{userId}")]
         [ProducesResponseType(typeof(PatientDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PatientDTO>> GetPatientById(Guid id)
+        public async Task<ActionResult<PatientDTO>> GetPatientById(Guid userId)
         {
             try
             {
-                var patient = await _patientService.GetById(id);
+                var patient = await _patientService.GetById(userId);
                 if (patient == null)
                 {
                     return NotFound();
                 }
-                return patient;
+                return Ok(patient);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Произошла ошибка GetPatientById");
                 return BadRequest();
             }
-
         }
 
         [HttpPost("Add")]
-        public async Task<IActionResult> AddPatientAsync(PatientDTO patient)
+        public async Task<IActionResult> AddPatientAsync([FromBody] PatientDTO patient)
         {
             try
             {
@@ -54,7 +50,14 @@ namespace PatientService.API.Controllers
                     return BadRequest("Пациент не заполнен.");
                 }
                 var result = await _patientService.AddAsync(patient);
-                return Ok(result);
+                if (result)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Не удалось добавить пациента.");
+                }
             }
             catch (Exception e)
             {
@@ -64,11 +67,15 @@ namespace PatientService.API.Controllers
         }
 
         [HttpPost("GetByIds")]
-        public async Task<IActionResult> GetByIdsAsync(Guid[] usersId)
+        public async Task<IActionResult> GetByIdsAsync([FromBody] Guid[] usersId)
         {
             try
             {
                 var result = await _patientService.GetByIds(usersId);
+                if (result == null || !result.Any())
+                {
+                    return NotFound();
+                }
                 return Ok(result);
             }
             catch (Exception e)
@@ -77,26 +84,5 @@ namespace PatientService.API.Controllers
                 return BadRequest();
             }
         }
-
-        [HttpPost("CreateTest")]
-        public async Task<IActionResult> CreatePatient(PatientDto patientDTO)
-        {
-            try
-            {
-                var responce = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
-                {
-                    Patient = patientDTO,
-                    Guid = Guid.NewGuid()
-                });
-                _logger.LogInformation("Получен ответ {responce}", responce.Message);
-                return Ok(responce.Message.Id);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Произошла ошибка Add");
-                return BadRequest();
-            }
-        }
-
     }
 }
