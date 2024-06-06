@@ -1,4 +1,5 @@
 ﻿using HelpersDTO.Patient.DTO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
@@ -83,6 +84,21 @@ namespace PatientService.Domain.Services
                 IsNew = p.IsNew
                 //Status = 
             }).ToList();
+        }
+
+        public async Task<PatientDTO> GetPatientByUserIdAsync(Guid userId)
+        {
+            var patient = await _repository.GetByUserIdAsync(userId);
+            if (patient == null) return null;
+            return new PatientDTO()
+            {
+                FirstName = patient.FirstName,
+                LastName = patient.LastName,
+                MiddleName = patient.MiddleName,
+                Phone = patient.PhoneNumber,
+                UserId = patient.UserId,
+                IsNew = patient.IsNew
+            };
         }
     }
 }
