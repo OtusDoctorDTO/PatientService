@@ -9,7 +9,7 @@ using HelpersDTO.CallCenter.DTO;
 namespace PatientService.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class PatientsController : ControllerBase
     {
         private readonly IPatientService _patientService;
