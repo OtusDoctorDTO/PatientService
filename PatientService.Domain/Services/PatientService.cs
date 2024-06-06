@@ -86,7 +86,7 @@ namespace PatientService.Domain.Services
             }).ToList();
         }
 
-        public async Task<PatientDTO> GetByUserIdAsync(Guid userId)
+        public async Task<PatientDTO> GetPatientByUserIdAsync(Guid userId)
         {
             var patient = await _repository.GetByUserIdAsync(userId);
             if (patient == null) return null;

@@ -12,6 +12,6 @@ namespace PatientService.Domain.Services
         Task UpdateAsync(Guid id);
         Task DeleteAsync(Guid id);
         Task<List<PatientDTO>?> GetByIds(Guid[] usersId);
-        Task<PatientDTO> GetByUserIdAsync(Guid userId);
+        Task<PatientDTO> GetPatientByUserIdAsync(Guid userId);
     }
 }
