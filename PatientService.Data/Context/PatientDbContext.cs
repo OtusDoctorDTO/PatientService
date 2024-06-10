@@ -7,6 +7,7 @@ namespace PatientService.Data.Context
     {
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
         public PatientDbContext(DbContextOptions<PatientDbContext> options)
     : base(options)

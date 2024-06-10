@@ -11,11 +11,13 @@ namespace PatientService.Domain.Services
     {
         private readonly ILogger<PatientService> _logger;
         private readonly IPatientRepository _repository;
+        private readonly IPatientOutboxService _patientOutboxService;
 
-        public PatientService(ILogger<PatientService> logger, IPatientRepository repository)
+        public PatientService(ILogger<PatientService> logger, IPatientRepository repository, IPatientOutboxService patientOutboxService)
         {
             _logger = logger;
             _repository = repository;
+            _patientOutboxService = patientOutboxService;
         }
 
         public async Task<PatientDTO?> GetById(Guid id)
@@ -86,7 +88,7 @@ namespace PatientService.Domain.Services
             }).ToList();
         }
 
-        public async Task<PatientDTO> GetPatientByUserIdAsync(Guid userId)
+        public async Task<PatientDTO?> GetPatientByUserIdAsync(Guid userId)
         {
             var patient = await _repository.GetByUserIdAsync(userId);
             if (patient == null) return null;

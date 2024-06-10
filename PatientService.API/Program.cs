@@ -60,13 +60,18 @@ namespace PatientService.API
                         _.IsolationLevel = IsolationLevel.ReadCommitted;
                     });
 
-                    cfg.ReceiveEndpoint(new TemporaryEndpointDefinition(), e =>
+                    cfg.ReceiveEndpoint("patient-service", e =>
                     {
                         e.ConfigureConsumer<PatientConsumer>(context);
                     });
+
                     cfg.ConfigureEndpoints(context);
                 });
             });
+
+            builder.Services.AddScoped<IPatientOutboxService, PatientOutboxService>();
+            builder.Services.AddScoped<IPatientOutboxRepository, PatientOutboxRepository>();
+            builder.Services.AddHostedService<OutboxProcessor>();
 
             var app = builder.Build();
 

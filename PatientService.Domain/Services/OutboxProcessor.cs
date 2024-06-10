@@ -1,54 +1,56 @@
-﻿using HelpersDTO.Patient.DTO;
-using MassTransit;
+﻿using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using PatientService.Domain.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PatientService.Data.Context;
 
 namespace PatientService.Domain.Services
 {
     public class OutboxProcessor : BackgroundService
     {
-        private readonly IPatientOutboxRepository _outboxRepository;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<OutboxProcessor> _logger;
-        private readonly IBus _bus;
 
-        public OutboxProcessor(IPatientOutboxRepository outboxRepository, ILogger<OutboxProcessor> logger, IBus bus)
+        public OutboxProcessor(IServiceProvider serviceProvider, ILogger<OutboxProcessor> logger)
         {
-            _outboxRepository = outboxRepository;
+            _serviceProvider = serviceProvider;
             _logger = logger;
-            _bus = bus;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("OutboxProcessor started.");
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var messages = await _outboxRepository.GetUnprocessedMessagesAsync();
-
-                foreach (var message in messages)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    try
-                    {
-                        var patient = JsonConvert.DeserializeObject<PatientDTO>(message.Payload);
-                        await _bus.Publish(patient);
+                    var dbContext = scope.ServiceProvider.GetRequiredService<PatientDbContext>();
+                    var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-                        message.ProcessedOn = DateTime.UtcNow;
-                        await _outboxRepository.UpdateAsync(message);
-                    }
-                    catch (Exception ex)
+                    var messages = dbContext.OutboxMessages.ToList();
+
+                    foreach (var message in messages)
                     {
-                        _logger.LogError(ex, "Ошибка при обработке сообщения из Outbox");
+                        try
+                        {
+                            var endpoint = new Uri(message.Destination);
+                            await publishEndpoint.Publish(endpoint, message.Content, stoppingToken);
+                            dbContext.OutboxMessages.Remove(message);
+                            await dbContext.SaveChangesAsync(stoppingToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error processing outbox message.");
+                        }
                     }
                 }
 
-                await Task.Delay(5000, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
+
+            _logger.LogInformation("OutboxProcessor stopped.");
         }
     }
 }

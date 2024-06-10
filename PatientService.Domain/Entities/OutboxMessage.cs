@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace PatientService.Domain.Entities
 {
-    internal class OutboxMessage
+    public class OutboxMessage
     {
+        public Guid Id { get; set; }
+        public string? Destination { get; set; }
+        public string? Content { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }
