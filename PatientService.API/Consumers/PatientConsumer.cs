@@ -1,10 +1,11 @@
 ﻿using HelpersDTO.CallCenter.DTO;
+using HelpersDTO.Patient.DTO;
 using MassTransit;
 using PatientService.Domain.Services;
 
 namespace PatientService.API.Consumers
 {
-    public class PatientConsumer : IConsumer<SavePatientDTORequest>
+    public class PatientConsumer : IConsumer<PatientDTO>, IConsumer<SavePatientDTORequest>
     {
         private readonly ILogger<PatientConsumer> _logger;
         private readonly IPatientService _service;
@@ -33,6 +34,20 @@ namespace PatientService.API.Consumers
                 _logger.LogError(e, "При сохранении пациента произошла ошибка");
             }
             await context.RespondAsync(result);
+        }
+
+        public async Task Consume(ConsumeContext<PatientDTO> context)
+        {
+            try
+            {
+                var patientDto = context.Message;
+                await _service.AddAsync(patientDto);
+                _logger.LogInformation("Пациент успешно добавлен с UserId {UserId}", patientDto.UserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при обработке сообщения о добавлении пациента с UserId {UserId}", context.Message.UserId);
+            }
         }
     }
 }

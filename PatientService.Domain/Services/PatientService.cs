@@ -1,9 +1,8 @@
 ﻿using HelpersDTO.Patient.DTO;
-using Microsoft.EntityFrameworkCore;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
-using System.Numerics;
 
 namespace PatientService.Domain.Services
 {
@@ -11,11 +10,13 @@ namespace PatientService.Domain.Services
     {
         private readonly ILogger<PatientService> _logger;
         private readonly IPatientRepository _repository;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public PatientService(ILogger<PatientService> logger, IPatientRepository repository)
+        public PatientService(ILogger<PatientService> logger, IPatientRepository repository, IPublishEndpoint publishEndpoint)
         {
             _logger = logger;
             _repository = repository;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<PatientDTO?> GetById(Guid id)
@@ -33,26 +34,18 @@ namespace PatientService.Domain.Services
             };
         }
 
-        public async Task<bool> AddAsync(PatientDTO patient)
+        public async Task AddAsync(PatientDTO patientDto)
         {
-            try
+            var patient = new Patient
             {
-                var patientDB = new Patient()
-                {
-                    FirstName = patient.FirstName,
-                    LastName = patient.LastName,
-                    MiddleName = patient.MiddleName,
-                    PhoneNumber = patient.Phone,
-                    UserId = patient.UserId,
-                    IsNew = patient.IsNew
-                };
-                return await _repository.AddAsync(patientDB);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Произошла ошибка при добавлении пациента.");
-            }
-            return false;
+                UserId = patientDto.UserId,
+                FirstName = patientDto.FirstName,
+                LastName = patientDto.LastName,
+                PhoneNumber = patientDto.Phone,
+                IsNew = patientDto.IsNew
+            };
+
+            await _repository.AddAsync(patient);
         }
 
         public async Task<IEnumerable<Patient>?> GetAllAsync()

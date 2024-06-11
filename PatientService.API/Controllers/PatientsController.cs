@@ -5,6 +5,7 @@ using PatientService.Domain.Services;
 using HelpersDTO.Patient.DTO;
 using HelpersDTO.CallCenter.DTO.Models;
 using HelpersDTO.CallCenter.DTO;
+using MassTransit.Transports;
 
 namespace PatientService.API.Controllers
 {
@@ -15,10 +16,12 @@ namespace PatientService.API.Controllers
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
         IRequestClient<SavePatientDTORequest> _client;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client, IPublishEndpoint publishEndpoint)
         {
             _patientService = patientService;
+            _publishEndpoint = publishEndpoint;
             _logger = logger;
             _client = client;
         }
@@ -53,16 +56,15 @@ namespace PatientService.API.Controllers
             {
                 if (patient == null)
                 {
-                    _logger.LogWarning("Попытка добавить пустого пациента");
                     return BadRequest("Пациент не заполнен.");
                 }
-                var result = await _patientService.AddAsync(patient);
-                _logger.LogInformation("Пациент добавлен: {Result}", result);
-                return Ok(result);
+
+                await _publishEndpoint.Publish(patient);
+                return Ok();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Произошла ошибка при добавлении пациента");
+                _logger.LogError(e, "Ошибка при добавлении пациента");
                 return BadRequest();
             }
         }

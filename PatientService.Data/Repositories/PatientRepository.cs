@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
@@ -9,10 +10,12 @@ namespace PatientService.Data.Repositories
     public class PatientRepository : IPatientRepository
     {
         private readonly PatientDbContext _dbContext;
+        private readonly ILogger<PatientRepository> _logger;
 
-        public PatientRepository(PatientDbContext dbContext)
+        public PatientRepository(PatientDbContext dbContext, ILogger<PatientRepository> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task UpdateAsync(Guid id)
@@ -43,11 +46,11 @@ namespace PatientService.Data.Repositories
                 await _dbContext.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // залогировать
+                _logger.LogError(ex, "Ошибка при добавлении пациента с UserId {UserId}", patient.UserId);
+                return false;
             }
-            return false;
         }
 
         public async Task<Patient?> GetByIdAsync(Guid id)
