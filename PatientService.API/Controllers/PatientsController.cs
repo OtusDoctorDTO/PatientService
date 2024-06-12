@@ -49,26 +49,6 @@ namespace PatientService.API.Controllers
             }
         }
 
-        [HttpPost("Add")]
-        public async Task<IActionResult> AddPatientAsync([FromBody] PatientDTO patient)
-        {
-            try
-            {
-                if (patient == null)
-                {
-                    return BadRequest("Пациент не заполнен.");
-                }
-
-                await _publishEndpoint.Publish(patient);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Ошибка при добавлении пациента");
-                return BadRequest();
-            }
-        }
-
         [HttpPost("GetByIds")]
         public async Task<IActionResult> GetByIdsAsync([FromBody] Guid[] usersId)
         {

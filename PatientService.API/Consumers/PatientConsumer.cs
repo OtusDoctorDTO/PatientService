@@ -1,11 +1,13 @@
 ﻿using HelpersDTO.CallCenter.DTO;
+using HelpersDTO.Patient;
 using HelpersDTO.Patient.DTO;
 using MassTransit;
 using PatientService.Domain.Services;
+using static MassTransit.ValidationResultExtensions;
 
 namespace PatientService.API.Consumers
 {
-    public class PatientConsumer : IConsumer<PatientDTO>, IConsumer<SavePatientDTORequest>
+    public class PatientConsumer : IConsumer<CreatePatientRequest>, IConsumer<SavePatientDTORequest>
     {
         private readonly ILogger<PatientConsumer> _logger;
         private readonly IPatientService _service;
@@ -36,18 +38,27 @@ namespace PatientService.API.Consumers
             await context.RespondAsync(result);
         }
 
-        public async Task Consume(ConsumeContext<PatientDTO> context)
+        public async Task Consume(ConsumeContext<CreatePatientRequest> context)
         {
+            _logger.LogInformation("Получен запрос CreatePatientRequest {message}", context.Message);
+            var response = new CreatePatientResponse()
+            {
+                Guid = context.Message.Guid,
+                Success = true,
+                ConnectionId = context.Message.ConnectionId
+            };
             try
             {
-                var patientDto = context.Message;
+                var patientDto = context.Message.Patient;
                 await _service.AddAsync(patientDto);
                 _logger.LogInformation("Пациент успешно добавлен с UserId {UserId}", patientDto.UserId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при обработке сообщения о добавлении пациента с UserId {UserId}", context.Message.UserId);
+                response.Success = false;
+                _logger.LogError(ex, "При добавлении пациента CreatePatientRequest произошла ошибка");
             }
+            await context.RespondAsync(response);
         }
     }
 }
