@@ -7,7 +7,7 @@ namespace PatientService.Domain.Services
     public interface IPatientService
     {
         Task<PatientDTO?> GetById(Guid id);
-        Task AddAsync(PatientDTO patient);
+        Task AddAsync(PatientDTO? patient);
         Task<IEnumerable<Patient>?> GetAllAsync();
         Task UpdateAsync(Guid id);
         Task DeleteAsync(Guid id);

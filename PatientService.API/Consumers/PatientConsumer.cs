@@ -1,9 +1,7 @@
 ﻿using HelpersDTO.CallCenter.DTO;
 using HelpersDTO.Patient;
-using HelpersDTO.Patient.DTO;
 using MassTransit;
 using PatientService.Domain.Services;
-using static MassTransit.ValidationResultExtensions;
 
 namespace PatientService.API.Consumers
 {
@@ -33,6 +31,7 @@ namespace PatientService.API.Consumers
             }
             catch (System.Exception e)
             {
+                result.Success = false;
                 _logger.LogError(e, "При сохранении пациента произошла ошибка");
             }
             await context.RespondAsync(result);
@@ -50,8 +49,18 @@ namespace PatientService.API.Consumers
             try
             {
                 var patientDto = context.Message.Patient;
-                await _service.AddAsync(patientDto);
-                _logger.LogInformation("Пациент успешно добавлен с UserId {UserId}", patientDto.UserId);
+                if (patientDto != null)
+                {
+                    await _service.AddAsync(patientDto);
+                    response.Success = true;
+
+                    _logger.LogInformation("Пациент успешно добавлен с UserId {UserId}", patientDto.UserId);
+                }
+                else
+                {
+                    response.Success = false;
+                    _logger.LogInformation("Пациент не добавлен");
+                }
             }
             catch (Exception ex)
             {

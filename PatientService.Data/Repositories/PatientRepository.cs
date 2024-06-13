@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using PatientService.Data.Context;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
-using System.Linq;
 
 namespace PatientService.Data.Repositories
 {
@@ -70,7 +69,7 @@ namespace PatientService.Data.Repositories
                 .Where(p => p.UserId != null && usersId.Any(userId => userId == p.UserId))
                 .ToListAsync();
         }
-        public async Task<Patient> GetByUserIdAsync(Guid userId)
+        public async Task<Patient?> GetByUserIdAsync(Guid? userId)
         {
             return await _dbContext.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
         }

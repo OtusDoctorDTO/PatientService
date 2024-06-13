@@ -1,11 +1,9 @@
-﻿using HelpersDTO.Patient;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using PatientService.Domain.Services;
 using HelpersDTO.Patient.DTO;
 using HelpersDTO.CallCenter.DTO.Models;
 using HelpersDTO.CallCenter.DTO;
-using MassTransit.Transports;
 
 namespace PatientService.API.Controllers
 {
@@ -16,12 +14,10 @@ namespace PatientService.API.Controllers
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
         IRequestClient<SavePatientDTORequest> _client;
-        private readonly IPublishEndpoint _publishEndpoint;
 
-        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client, IPublishEndpoint publishEndpoint)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger, IRequestClient<SavePatientDTORequest> client)
         {
             _patientService = patientService;
-            _publishEndpoint = publishEndpoint;
             _logger = logger;
             _client = client;
         }
@@ -70,13 +66,13 @@ namespace PatientService.API.Controllers
         {
             try
             {
-                var responce = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
+                var response = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
                 {
                     Patient = patientDTO,
                     Guid = Guid.NewGuid()
                 });
-                _logger.LogInformation("Получен ответ {responce}", responce.Message);
-                return Ok(responce.Message.Id);
+                _logger.LogInformation("Получен ответ {response}", response.Message);
+                return Ok(response.Message.Id);
             }
             catch (Exception e)
             {
