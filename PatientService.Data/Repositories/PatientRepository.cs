@@ -37,8 +37,13 @@ namespace PatientService.Data.Repositories
             }
         }
 
-        public async Task<bool> AddAsync(Patient patient)
+        public async Task<bool> AddAsync(Patient? patient)
         {
+            if (patient == null)
+            {
+                _logger.LogError("Ошибка при добавлении пациента: объект patient равен null");
+                return false;
+            }
             try
             {
                 await _dbContext.Patients.AddAsync(patient);
