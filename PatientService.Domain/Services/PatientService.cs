@@ -1,58 +1,29 @@
 ﻿using HelpersDTO.Patient.DTO;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using PatientService.API.Extensions;
 using PatientService.Domain.Entities;
 using PatientService.Domain.Repositories;
-using System.Numerics;
 
 namespace PatientService.Domain.Services
 {
     public class PatientService : IPatientService
     {
-        private readonly ILogger<PatientService> _logger;
         private readonly IPatientRepository _repository;
 
-        public PatientService(ILogger<PatientService> logger, IPatientRepository repository)
+        public PatientService(IPatientRepository repository)
         {
-            _logger = logger;
             _repository = repository;
         }
 
         public async Task<PatientDTO?> GetById(Guid id)
         {
             var patient = await _repository.GetByIdAsync(id);
-            if (patient == null) return null;
-            return new PatientDTO()
-            {
-                FirstName = patient.FirstName,
-                LastName = patient.LastName,
-                MiddleName = patient.MiddleName,
-                Phone = patient.PhoneNumber,
-                UserId = patient.UserId,
-                IsNew = patient.IsNew
-            };
+            return patient.ToPatientDto();
         }
 
-        public async Task<bool> AddAsync(PatientDTO patient)
+        public async Task AddAsync(PatientDTO? patientDto)
         {
-            try
-            {
-                var patientDB = new Patient()
-                {
-                    FirstName = patient.FirstName,
-                    LastName = patient.LastName,
-                    MiddleName = patient.MiddleName,
-                    PhoneNumber = patient.Phone,
-                    UserId = patient.UserId,
-                    IsNew = patient.IsNew
-                };
-                return await _repository.AddAsync(patientDB);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Произошла ошибка при добавлении пациента.");
-            }
-            return false;
+            var patientDB = patientDto.ToPatientDB();
+            await _repository.AddAsync(patientDB);
         }
 
         public async Task<IEnumerable<Patient>?> GetAllAsync()
@@ -86,19 +57,10 @@ namespace PatientService.Domain.Services
             }).ToList();
         }
 
-        public async Task<PatientDTO> GetPatientByUserIdAsync(Guid userId)
+        public async Task<PatientDTO?> GetPatientByUserIdAsync(Guid? userId)
         {
             var patient = await _repository.GetByUserIdAsync(userId);
-            if (patient == null) return null;
-            return new PatientDTO()
-            {
-                FirstName = patient.FirstName,
-                LastName = patient.LastName,
-                MiddleName = patient.MiddleName,
-                Phone = patient.PhoneNumber,
-                UserId = patient.UserId,
-                IsNew = patient.IsNew
-            };
+            return patient.ToPatientDto();  
         }
     }
 }

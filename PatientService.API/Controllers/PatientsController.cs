@@ -1,5 +1,4 @@
-﻿using HelpersDTO.Patient;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using PatientService.Domain.Services;
 using HelpersDTO.Patient.DTO;
@@ -46,27 +45,6 @@ namespace PatientService.API.Controllers
             }
         }
 
-        [HttpPost("Add")]
-        public async Task<IActionResult> AddPatientAsync([FromBody] PatientDTO patient)
-        {
-            try
-            {
-                if (patient == null)
-                {
-                    _logger.LogWarning("Попытка добавить пустого пациента");
-                    return BadRequest("Пациент не заполнен.");
-                }
-                var result = await _patientService.AddAsync(patient);
-                _logger.LogInformation("Пациент добавлен: {Result}", result);
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Произошла ошибка при добавлении пациента");
-                return BadRequest();
-            }
-        }
-
         [HttpPost("GetByIds")]
         public async Task<IActionResult> GetByIdsAsync([FromBody] Guid[] usersId)
         {
@@ -88,13 +66,13 @@ namespace PatientService.API.Controllers
         {
             try
             {
-                var responce = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
+                var response = await _client.GetResponse<SavePatientDTOResponse>(new SavePatientDTORequest()
                 {
                     Patient = patientDTO,
                     Guid = Guid.NewGuid()
                 });
-                _logger.LogInformation("Получен ответ {responce}", responce.Message);
-                return Ok(responce.Message.Id);
+                _logger.LogInformation("Получен ответ {response}", response.Message);
+                return Ok(response.Message.Id);
             }
             catch (Exception e)
             {
